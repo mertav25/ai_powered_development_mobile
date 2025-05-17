@@ -22,6 +22,48 @@ from datetime import timedelta
 import json
 import os
 from knox.models import AuthToken
+from firebase_admin import auth, firestore
+from rest_framework import status
+from .serializers import FirebaseAuthSerializer
+
+db = firestore.client()
+
+class FirebaseLogin(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = FirebaseAuthSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                # Firebase'den kullanıcı bilgilerini al
+                firebase_user = auth.get_user(serializer.validated_data['uid'])
+                
+                # Django kullanıcısını bul veya oluştur
+                user, created = User.objects.get_or_create(
+                    email=firebase_user.email,
+                    defaults={'username': firebase_user.email.split('@')[0]}
+                )
+                
+                # Profili güncelle
+                profile, _ = Profile.objects.get_or_create(user=user)
+                profile.firebase_uid = firebase_user.uid
+                profile.save()
+                profile.save_to_firestore()  # Firestore'a kaydet
+                
+                # Knox token oluştur
+                _, token = AuthToken.objects.create(user)
+                
+                return Response({
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email
+                    },
+                    'token': token
+                })
+            except Exception as e:
+                return Response({'error': str(e)}, status=400)
+        return Response(serializer.errors, status=400)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -89,12 +131,23 @@ class TopicViewSet(ModelViewSet):
     serializer_class = TopicSerializer
     permission_classes = [IsAuthenticated]
 
+
     def perform_create(self, serializer):
         topic = serializer.save(user=self.request.user)
-        profile = Profile.objects.get(user=self.request.user)    
+        profile = Profile.objects.get(user=self.request.user)
 
-        def perform_update(self, serializer):
-            topic = serializer.save()
+        topic_ref = db.collection('topics').document(str(topic.id))
+        topic_ref.set({
+            'user_id': str(self.request.user.id),
+            'username': self.request.user.username,
+            'topic': topic.topic,
+            'content': topic.content,
+            'created_at': topic.created_at.isoformat(),
+            'image_url': topic.image.url if topic.image else None
+        })    
+
+    def perform_update(self, serializer):
+        topic = serializer.save()
         if topic.is_locked and (topic.image or topic.pdf_file or topic.word_file):
             Profile.objects.filter(user=self.request.user).update(
                 points=max(0, self.request.user.profile.points + 15)

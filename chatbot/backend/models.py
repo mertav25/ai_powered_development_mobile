@@ -3,12 +3,24 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from firebase_admin import firestore
+
+db = firestore.client()
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True, default='profile_pics/default.png')
-    
+    firebase_uid = models.CharField(max_length=128, blank=True, null=True)  # Firebase UID'si
+
+    def save_to_firestore(self):
+        user_ref = db.collection('users').document(str(self.user.id))
+        user_ref.set({
+            'username': self.user.username,
+            'email': self.user.email,
+            'profile_pic_url': self.profile_pic.url if self.profile_pic else None,
+        })
+
     def __str__(self):
         return self.user.username
     

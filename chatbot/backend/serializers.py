@@ -1,7 +1,23 @@
 from rest_framework import serializers
-from .models import Picture, Topic, Comment, Profile, UnlockedContent, PointTransaction
+from .models import Picture, Topic, Comment, Profile
 from django.urls import reverse
 from django.contrib.auth.models import User
+from firebase_admin import auth
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class FirebaseAuthSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+    def validate(self, data):
+        try:
+            decoded_token = auth.verify_id_token(data['token'])
+            data['uid'] = decoded_token['uid']
+            return data
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
 
 class PictureSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
