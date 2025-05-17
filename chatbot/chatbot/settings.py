@@ -15,8 +15,8 @@ import firebase_admin
 from firebase_admin import credentials
 
 # Firebase servis hesabı anahtarını indirin (JSON dosyası)
-FIREBASE_CRED = credentials.Certificate("path/to/serviceAccountKey.json")
-firebase_admin.initialize_app(FIREBASE_CRED)
+#FIREBASE_CRED = credentials.Certificate("path/to/serviceAccountKey.json")
+#firebase_admin.initialize_app(FIREBASE_CRED)
 
 from dotenv import load_dotenv
 import os
