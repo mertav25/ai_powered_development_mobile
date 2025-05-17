@@ -1,0 +1,21 @@
+* [33mccde97f[m[33m ([m[1;31morigin/Development_Backend[m[33m)[m Update haritamodel.py
+[31m|[m *   [33m91aa6fe[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mDevelopment_Backend[m[33m)[m Merge branch 'Development_Backend' of https://github.com/mertav25/ai_powered_development_mobile into Development_Backend
+[31m|[m [32m|[m[31m\[m  
+[31m|[m [32m|[m[31m/[m  
+[31m|[m[31m/[m[32m|[m   
+* [32m|[m [33m355f702[m Create haritamodel.py
+[33m|[m * [33m9a09363[m serializers
+[33m|[m[33m/[m  
+* [33m29b20b3[m Backend güncelleme
+* [33mc06a8b2[m settings.py
+* [33m05fa4fd[m Backend için yapılan değişiklikler açıklaması
+* [33ma5bc704[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m add: initial project setup with comprehensive README
+* [33m642beab[m add: create detailed guide for obtaining a Gemini API key
+* [33mad77863[m add: create participant profile template with guidance and checklist
+* [33m0333f80[m add:   Gemini API prompt usage guide for Flutter applications
+* [33mfc2d109[m add: add comprehensive guide for integrating Firebase Cloud Functions in mobile applications
+* [33m28803fb[m add: add comprehensive guide for implementing Firebase Authentication in mobile apps
+* [33mef2586a[m add: add comprehensive documentation for Bloc and Cubit usage principles in Flutter applications
+* [33m1ffa785[m add:  add comprehensive documentation for Dart 3 pattern matching, branching, and records
+* [33m12498c9[m add:  initial project documentation and structure files
+* [33mdb6739c[m Initial commit
