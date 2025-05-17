@@ -25,6 +25,25 @@ from knox.models import AuthToken
 from firebase_admin import auth, firestore
 from rest_framework import status
 from .serializers import FirebaseAuthSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import GeminiPromptSerializer
+from .gemini_utils import GeminiHelper
+
+class GeminiAPIView(APIView):
+    def post(self, request):
+        serializer = GeminiPromptSerializer(data=request.data)
+        if serializer.is_valid():
+            prompt = serializer.validated_data['prompt']
+            model = serializer.validated_data.get('model', 'gemini-pro')
+            
+            response = GeminiHelper.generate_response(prompt, model)
+            
+            if response:
+                return Response({"response": response}, status=status.HTTP_200_OK)
+            return Response({"error": "Gemini API error"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 db = firestore.client()
 
@@ -175,18 +194,7 @@ class CommentViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         topic = Topic.objects.get(id=self.request.data['topic'])
-        # Kendi gönderinize yorum yapabilirsiniz, ancak puan kazanmazsınız
-        comment = serializer.save(user=self.request.user, topic=topic)
-        if topic.user != self.request.user:
-            # Başka kullanıcının gönderisine yorum yapan kullanıcıya 5 puan
-            Profile.objects.filter(user=self.request.user).update(
-                points=max(0, self.request.user.profile.points + 5)
-            )
-            PointTransaction.objects.create(
-                user=self.request.user,
-                points=5,
-                description=f"Yorum yapıldı: {topic.topic}"
-            )
+       
 
     def perform_update(self, serializer):
         comment = self.get_object()

@@ -18,6 +18,12 @@ from firebase_admin import credentials
 FIREBASE_CRED = credentials.Certificate("path/to/serviceAccountKey.json")
 firebase_admin.initialize_app(FIREBASE_CRED)
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+GEMINI_API_KEY = os.getenv('AIzaSyD1IeUp46WjEUjIO7wHaQGyQTveHPXZDbI')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

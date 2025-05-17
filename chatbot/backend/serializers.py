@@ -8,6 +8,10 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+class GeminiPromptSerializer(serializers.Serializer):
+    prompt = serializers.CharField()
+    model = serializers.CharField(required=False, default="gemini-pro")
+
 class FirebaseAuthSerializer(serializers.Serializer):
     token = serializers.CharField()
 
